@@ -1,0 +1,45 @@
+from flask import Flask, request, jsonify
+from tensorflow.keras.preprocessing import image
+from tensorflow.keras.models import load_model
+import numpy as np
+import os
+from PIL import Image
+
+# Initialize Flask app
+app = Flask(__name__)
+
+# Load the trained model (replace with your actual model file path)
+model = load_model('scratch_detector_model.h5')
+
+# Route for uploading and predicting image
+@app.route('/predict', methods=['POST'])
+def predict():
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file part'}), 400
+    file = request.files['file']
+    print(request.files)
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+
+    try:
+        # Open image and preprocess it for the model
+        img = Image.open(file)
+        img = img.resize((224, 224))  # Resize image to match model's input shape
+        img_array = np.array(img) / 255.0  # Normalize image
+        print("File Receives")
+        # Add batch dimension (model expects 4D input)
+        img_array = np.expand_dims(img_array, axis=0)
+
+        # Predict using the model
+        prediction = model.predict(img_array)
+
+        # Return the result based on prediction
+        result = 'Scratch' if prediction[0][0] > 0.5 else 'Scratchless'
+        return jsonify({'prediction': result})
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# Run the app locally on port 5000
+if __name__ == '__main__':
+    app.run(debug=True, host='0.0.0.0', port=5000)
