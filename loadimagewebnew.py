@@ -17,7 +17,7 @@ device_models = {}
 def load_device_model(device_name):
     if device_name not in device_models:
         try:
-            model_path = f'{device_name}_model.h5'
+            model_path = f'/pythonprojgit/pythonImageProcessing/{device_name}_model.h5'
             print(f"Loading model from {model_path}")
             model = load_model(model_path)
             device_models[device_name] = model  # Cache the model
