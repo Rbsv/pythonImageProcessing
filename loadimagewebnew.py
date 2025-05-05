@@ -1,3 +1,7 @@
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+
+import tensorflow as tf
 from flask import Flask, request, jsonify
 from keras.models import load_model
 from PIL import Image
@@ -63,6 +67,6 @@ def predict():
 
     return jsonify({"device_name": device_name, "status": result})
 
-if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 10000))
-    app.run(host='0.0.0.0', port=port)
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
